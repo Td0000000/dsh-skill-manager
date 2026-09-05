@@ -1,0 +1,4 @@
+- insert:
+    - id: td-skill-manager
+      name: 'dsh-skill-manager'
+      disabled: !!js "[...ctx.loader.entries()].some((e) => e.options.name === 'dsh-skill-manager' && e.options.id !== 'td-skill-manager' && !e.disabled)"

@@ -1,0 +1,16 @@
+{
+  "id": "dsh-external/dsh-skill-manager",
+  "version": "1.0.0",
+  "main": "./lib/index.js",
+  "description": "DSH 设置页技能管理器：全局与多项目技能扫描、分类展示、批量与单项启停、删除与热刷新",
+  "engines": {
+    "dsh": ">=0.1.2-rc.1"
+  },
+  "contributes": {
+    "tools": [],
+    "skills": []
+  },
+  "client": {
+    "main": "./lib/client-registry.js"
+  }
+}
