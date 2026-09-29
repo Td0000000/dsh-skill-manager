@@ -109,13 +109,27 @@ function parseFrontmatter(content: string): { name?: string; description?: strin
   return {}
 }
 
+/** Whether this Host process is the native Windows build (not WSL/Linux). */
+const IS_WINDOWS = process.platform === 'win32'
+
+/**
+ * Translate between native Windows paths and their WSL `/mnt/<drive>` form.
+ *
+ * Each direction is only meaningful on the platform it targets: rewriting a
+ * native `C:\...` path to `/mnt/c/...` while running ON Windows produces a path
+ * that cannot exist, so every existence check afterwards failed. Paths already
+ * native to this platform are therefore returned untouched.
+ */
 function normalizeCrossPlatformPath(p: string): string {
   if (!p) return ''
-  let cleaned = p.replace(/^"|"$/g, '').trim()
-  if (cleaned.startsWith('/mnt/') && cleaned.length >= 7 && cleaned[6] === '/') {
-    const drive = cleaned[5].toUpperCase()
-    const rest = cleaned.substring(6).replace(/\//g, '\\')
-    return `${drive}:${rest}`
+  const cleaned = p.replace(/^"|"$/g, '').trim()
+  if (IS_WINDOWS) {
+    if (cleaned.startsWith('/mnt/') && cleaned.length >= 7 && cleaned[6] === '/') {
+      const drive = cleaned[5].toUpperCase()
+      const rest = cleaned.substring(6).replace(/\//g, '\\')
+      return `${drive}:${rest}`
+    }
+    return cleaned
   }
   if (/^[A-Za-z]:[\\/]/.test(cleaned)) {
     const drive = cleaned[0].toLowerCase()

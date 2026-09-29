@@ -10,9 +10,25 @@ DeepSeek Harness (DSH) 设置页技能管理独立插件。
 
 ## 适配版本说明
 
-- **DeepSeek Harness (DSH)**：适配 `0.1.x` 系列（包括 `0.1.2-rc.1` 及更高版本开发分支）。
+- **DeepSeek Harness (DSH)**：适配 `0.2.x` 系列（`0.2.0-rc.1` 及以上）。已在 **DSH `0.2.0-rc.2` / cordis `4.0.4`** 上实测通过。
 - **微内核架构**：基于 `@deepseek-ai/cordis` `^4.0.2` 插件生命周期与依赖注入机制。
 - **环境要求**：Node.js `>= 20.0.0`，pnpm `>= 9.0.0`，React `>= 18.0.0`。
+
+### 0.2.x 适配要点
+
+| 契约 | 本插件用法 | DSH 0.2.0-rc.2 |
+| --- | --- | --- |
+| 宿主插件形态 | `name` / `inject` / `apply` | 一致 |
+| HTTP 路由 | `ctx.webServer.register({ kind: 'prefix', path, handler })` | 一致 |
+| 客户端槽位 | `ctx.slots.inject(key, () => ctx.slots.register({ name, id, order, label }, C))` | 一致（与官方 `templates/decoration/client.js` 相同） |
+| 客户端 bundle | `window.__ModuleLoader__.load({ id, factory })`，`id` = 包名 | 一致 |
+| 客户端声明 | `dsh.client = { platform: 'web', immediately, inject }` | 一致（解析器接受 `immediately`） |
+| 打包补丁 | `dsh.bundle.patch` → `- insert:` 行 | 一致 |
+| 界面语言 | `locale.getLocale().active`（保留 0.1.x 的 `get()` / `current` 回退） | 一致 |
+
+> DSH 的版本兼容门禁只检查 `peerDependencies` 中声明的 `@deepseek-ai/dsh*` 范围
+> （`engines.dsh` 不参与门禁）。本插件与官方外部插件模板一致，**不声明 DSH peer**，
+> 因此不施加版本约束。
 
 > ⚠️ **重要说明（当前阶段安装注意）**：
 > 目前 DeepSeek Harness 官方框架尚处于快速迭代阶段，**尚未面向公共 npm 仓库打包编译发布全局二进制**。

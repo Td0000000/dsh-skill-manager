@@ -3,14 +3,29 @@ import { SkillManagerSection } from './SkillManagerSection.tsx'
 
 export const inject = ['slots', 'locale']
 
+/**
+ * Read the active locale id across DSH generations.
+ *
+ * DSH 0.2.x exposes `locale.getLocale()` returning
+ * `{ active, locales, revision }`; the 0.1.x line exposed `locale.get()` /
+ * `locale.current`. Probing both keeps the section label in step with the UI
+ * language instead of falling back to Chinese forever.
+ */
+function activeLocaleId(ctx: Context): string {
+  try {
+    const locale = (ctx as any).locale
+    const snapshot = locale?.getLocale?.() ?? locale?.get?.() ?? locale?.current
+    const id = typeof snapshot === 'string' ? snapshot : snapshot?.active
+    return typeof id === 'string' ? id : ''
+  } catch {
+    return ''
+  }
+}
+
 export function apply(ctx: Context) {
   const isZh = () => {
-    try {
-      const loc = (ctx as any).locale?.get?.() || (ctx as any).locale?.current
-      return !loc || String(loc).startsWith('zh')
-    } catch {
-      return true
-    }
+    const id = activeLocaleId(ctx)
+    return id === '' ? true : id.toLowerCase().startsWith('zh')
   }
 
   // settings.section is declared by @deepseek-ai/dsh-client-ui-settings.
